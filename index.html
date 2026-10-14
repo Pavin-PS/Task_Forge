@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10243a">
+  <meta name="description" content="Personal job task manager for engineering work, deadlines, and daily priorities.">
+  <title>TaskForge | Personal Job Task Manager</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#" aria-label="TaskForge home">
+        <span class="brand-mark">TF</span>
+        <span><strong>TaskForge</strong><small>PERSONAL WORKSPACE</small></span>
+      </a>
+      <div class="workspace-label">WORKSPACE</div>
+      <nav class="nav-list" aria-label="Task filters">
+        <button class="nav-item active" data-filter="all"><span class="nav-icon">▦</span> All tasks <span class="nav-count" id="navAll">0</span></button>
+        <button class="nav-item" data-filter="today"><span class="nav-icon">◷</span> Today <span class="nav-count" id="navToday">0</span></button>
+        <button class="nav-item" data-filter="upcoming"><span class="nav-icon">▣</span> Upcoming</button>
+        <button class="nav-item" data-filter="overdue"><span class="nav-icon">!</span> Overdue <span class="nav-count alert" id="navOverdue">0</span></button>
+        <button class="nav-item" data-filter="completed"><span class="nav-icon">✓</span> Completed</button>
+      </nav>
+      <div class="sidebar-divider"></div>
+      <div class="workspace-label">JOB CATEGORIES</div>
+      <div class="category-nav" id="categoryNav">
+        <button class="category-link" data-category="Electrical Design"><i class="dot blue"></i>Electrical Design</button>
+        <button class="category-link" data-category="BOM & Documentation"><i class="dot violet"></i>BOM & Documentation</button>
+        <button class="category-link" data-category="PLC / HMI / VFD"><i class="dot green"></i>PLC / HMI / VFD</button>
+        <button class="category-link" data-category="Testing & Troubleshooting"><i class="dot orange"></i>Testing & Troubleshooting</button>
+        <button class="category-link" data-category="Meetings & Follow-ups"><i class="dot pink"></i>Meetings & Follow-ups</button>
+        <button class="category-link" data-category="Personal"><i class="dot gray"></i>Personal</button>
+      </div>
+      <div class="sidebar-bottom">
+        <div class="local-note"><span class="lock">▣</span><div><strong>Private to this browser</strong><small>Your tasks are saved locally on this device.</small></div></div>
+        <button class="text-button" id="exportBtn">↗ Export backup (JSON)</button>
+        <label class="text-button import-label" for="importFile">↙ Import backup (JSON)</label>
+        <input type="file" id="importFile" accept=".json,application/json" hidden>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenu" aria-label="Toggle menu">☰</button>
+        <div class="breadcrumb">Workspace <span>/</span> <strong id="breadcrumbCurrent">All tasks</strong></div>
+        <div class="top-actions">
+          <span class="local-status"><i></i> Saved locally</span>
+          <button class="avatar" title="Personal workspace">P</button>
+        </div>
+      </header>
+
+      <section class="content">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow" id="currentDate">YOUR WORKSPACE</p>
+            <h1 id="pageTitle">All tasks</h1>
+            <p class="subtitle" id="pageSubtitle">Plan your work. Track your progress. Deliver on time.</p>
+          </div>
+          <button class="primary-btn" id="addTaskBtn"><span>＋</span> New task</button>
+        </div>
+
+        <section class="stats-grid" aria-label="Task summary">
+          <article class="stat-card"><div class="stat-top"><span>Total tasks</span><span class="stat-icon navy">▦</span></div><div class="stat-value" id="totalStat">0</div><div class="stat-foot">Across your workspace</div></article>
+          <article class="stat-card"><div class="stat-top"><span>Due today</span><span class="stat-icon blue-bg">◷</span></div><div class="stat-value" id="todayStat">0</div><div class="stat-foot">Tasks scheduled for today</div></article>
+          <article class="stat-card"><div class="stat-top"><span>Overdue</span><span class="stat-icon red-bg">!</span></div><div class="stat-value" id="overdueStat">0</div><div class="stat-foot">Need your attention</div></article>
+          <article class="stat-card"><div class="stat-top"><span>Completed</span><span class="stat-icon green-bg">✓</span></div><div class="stat-value" id="completedStat">0</div><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div><div class="stat-foot" id="completionFoot">0% completion rate</div></article>
+        </section>
+
+        <section class="task-panel">
+          <div class="panel-header">
+            <div><h2>Task list</h2><p id="resultCount">0 tasks</p></div>
+            <div class="toolbar">
+              <label class="search-box"><span>⌕</span><input id="searchInput" type="search" placeholder="Search tasks..." aria-label="Search tasks"></label>
+              <select id="priorityFilter" class="filter-select" aria-label="Filter by priority"><option value="all">All priorities</option><option value="High">High priority</option><option value="Medium">Medium priority</option><option value="Low">Low priority</option></select>
+              <select id="sortSelect" class="filter-select" aria-label="Sort tasks"><option value="due">Sort: Due date</option><option value="priority">Sort: Priority</option><option value="created">Sort: Recently added</option><option value="title">Sort: Title</option></select>
+            </div>
+          </div>
+          <div class="table-head"><span class="task-col">TASK</span><span>CATEGORY</span><span>PRIORITY</span><span>DUE DATE</span><span>STATUS</span><span class="actions-col">ACTIONS</span></div>
+          <div id="taskList" class="task-list"></div>
+          <div id="emptyState" class="empty-state">
+            <div class="empty-illustration">✓</div><h3 id="emptyTitle">Ready when you are</h3><p id="emptyText">Add your first task to start organizing your work.</p><button class="primary-btn" id="emptyAddBtn">＋ Create your first task</button>
+          </div>
+          <div class="panel-footer"><span id="footerCount">Showing 0 tasks</span><button class="subtle-btn" id="clearCompletedBtn">Clear completed</button></div>
+        </section>
+        <footer class="footer-note">TaskForge · Personal productivity workspace <span>Runs in your browser · No account required</span></footer>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" hidden>
+    <section class="task-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header"><div><p class="eyebrow">TASK DETAILS</p><h2 id="modalTitle">Create a task</h2></div><button class="icon-btn" id="closeModalBtn" aria-label="Close dialog">×</button></div>
+      <form id="taskForm">
+        <input type="hidden" id="taskId">
+        <label class="form-field full"><span>Task title <b>*</b></span><input id="taskTitle" maxlength="140" required placeholder="e.g. Update HPN control panel BOM"></label>
+        <label class="form-field full"><span>Description</span><textarea id="taskDescription" rows="3" maxlength="1200" placeholder="Add notes, requirements, or next steps..."></textarea></label>
+        <div class="form-grid">
+          <label class="form-field"><span>Category</span><select id="taskCategory"><option>Electrical Design</option><option>BOM & Documentation</option><option>PLC / HMI / VFD</option><option>Testing & Troubleshooting</option><option>Meetings & Follow-ups</option><option>Personal</option><option>Other</option></select></label>
+          <label class="form-field"><span>Priority</span><select id="taskPriority"><option>Medium</option><option>High</option><option>Low</option></select></label>
+          <label class="form-field"><span>Due date</span><input id="taskDueDate" type="date"></label>
+          <label class="form-field"><span>Status</span><select id="taskStatus"><option value="Pending">Pending</option><option value="In Progress">In progress</option><option value="Completed">Completed</option></select></label>
+        </div>
+        <div class="modal-actions"><button type="button" class="secondary-btn" id="cancelModalBtn">Cancel</button><button type="submit" class="primary-btn" id="saveTaskBtn">Save task</button></div>
+      </form>
+    </section>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="script.js"></script>
+</body>
+</html>
